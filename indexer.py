@@ -3,17 +3,16 @@ from pathlib import Path
 
 class Indexer():
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         self.files = {} # file template > {"index":"name"}
         self.old = self.files
         self.new_file = None
         self.new_index = None
-        # start to index
-        self.index()
-
+        self.path = None
+        
     def index(self):
         formats = {"py":False,"exe":False}
-        for _,_,files in os.walk(Path('.')):
+        for _,_,files in os.walk(self.path):
             for file in files:
                 if not file.split('.')[-1] in formats.keys():
                     try:
@@ -22,7 +21,7 @@ class Indexer():
                         name = " ".join(a[1:])[0:]
                         self.files[index] = name
                     except:
-                        print(f"there is no index for file: {file}")
+                        # print(f"there is no index for file: {file}")
                         self.new_file = file
 
     def full_names(self,dict):
@@ -41,16 +40,16 @@ class Indexer():
         old_part = list(self.files.items())[from_index-1:]
 
         # if the new file is wanted to be the last index
-        print(len(self.files))
+        # print(len(self.files))
         if len(old_part) == 0 and (self.new_index > len(self.files)):
-            os.rename(self.new_file,f"{str(len(self.files)+1)} {self.new_file}")
+            self.rename(self.new_file, f"{str(len(self.files)+1)} {self.new_file}")
         else:
             for old_index,file in old_part:
                 # adding the new file
                 if old_index == self.new_index:
-                    os.rename(self.new_file,f"{str(self.new_index)} {self.new_file}")
+                    self.rename(self.new_file,f"{str(self.new_index)} {self.new_file}")
                 # incrementing the old files
-                os.rename(f"{str(old_index)} {file}",f"{str(old_index+1)} {file}")
+                self.rename(f"{str(old_index)} {file}",f"{str(old_index+1)} {file}")
         self.index()
 
     def order_rename(self):
@@ -59,7 +58,7 @@ class Indexer():
         file_list = sorted(self.files.items())
         new_index = 1
         for old_index,file in file_list:
-            os.rename(f"{str(old_index)} {file}",f"{str(new_index)} {file}")
+            self.rename(f"{str(old_index)} {file}",f"{str(new_index)} {file}")
             new_index+=1
 
     def pprint(self,file):
@@ -73,3 +72,8 @@ class Indexer():
     def sort(self, old, reverse = False):
         new = dict(sorted(self.files.items(),reverse = reverse))
         return new
+
+    def rename(self, old, new):
+        src = self.path + "/" + old
+        dest = self.path + "/" + new
+        os.rename(src, dest)

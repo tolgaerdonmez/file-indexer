@@ -1,2 +1,4 @@
 *.pdf
 *.gpx
+__pycache__
+*.spec
