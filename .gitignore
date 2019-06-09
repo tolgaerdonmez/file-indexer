@@ -2,3 +2,4 @@
 *.gpx
 __pycache__
 *.spec
+*.json

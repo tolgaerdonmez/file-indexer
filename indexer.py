@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-
+from platform import system as os_name
 class Indexer():
 
     def __init__(self):
@@ -74,6 +74,11 @@ class Indexer():
         return new
 
     def rename(self, old, new):
-        src = self.path + "/" + old
-        dest = self.path + "/" + new
+        sep = None
+        if os_name() == "Windows":
+            sep = "\\"
+        else:
+            sep = "/"
+        src = self.path + sep + old
+        dest = self.path + sep + new
         os.rename(src, dest)
