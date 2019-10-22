@@ -28,7 +28,7 @@ class Indexer():
         
         if check_files != self.files:
             self.files = check_files
-        self.last_index = len(self.files.keys())
+        self.last_index = len(self.files.keys())+1
 
     def full_names(self,dict):
         full_names = []
