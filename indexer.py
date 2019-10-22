@@ -9,9 +9,11 @@ class Indexer():
         self.new_file = None
         self.new_index = None
         self.path = None
-        
+        self.last_index = 0
+
     def index(self):
         formats = {"py":False,"exe":False}
+        check_files = {}
         for _,_,files in os.walk(self.path):
             for file in files:
                 if not file.split('.')[-1] in formats.keys():
@@ -19,10 +21,14 @@ class Indexer():
                         a = file.split(" ")
                         index = int(a[0])
                         name = " ".join(a[1:])[0:]
-                        self.files[index] = name
+                        check_files[index] = name
                     except:
                         # print(f"there is no index for file: {file}")
                         self.new_file = file
+        
+        if check_files != self.files:
+            self.files = check_files
+        self.last_index = len(self.files.keys())
 
     def full_names(self,dict):
         full_names = []
@@ -30,9 +36,11 @@ class Indexer():
             full_names.append(str(index) + " " + name)
         return full_names
 
-    def increment(self, from_index):
+    def increment(self, from_index = None):
         if self.new_file == None:
             return False
+        if not from_index:
+            from_index = self.last_index
         self.new_index = from_index
         # self.pprint(self.files)
         self.files = self.sort(self.files) # first sorting for insurance
@@ -53,12 +61,18 @@ class Indexer():
         self.index()
 
     def order_rename(self):
-        if self.new_file != None:
-            return False
+        # if self.new_file != None:
+        #     return False
         file_list = sorted(self.files.items())
         new_index = 1
         for old_index,file in file_list:
-            self.rename(f"{str(old_index)} {file}",f"{str(new_index)} {file}")
+            if old_index == new_index:
+                new_index+=1
+                continue
+            try:
+                self.rename(f"{str(old_index)} {file}",f"{str(new_index)} {file}")
+            except FileNotFoundError:
+                del(file_list[old_index])    
             new_index+=1
 
     def pprint(self,file):

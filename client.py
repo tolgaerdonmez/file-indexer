@@ -102,8 +102,10 @@ class MainWindow(QWidget):
             pass
         
         self.indexer.index()
-        self.indexer.increment(int(self.index_input.text()))
-        
+        try:
+            self.indexer.increment(int(self.index_input.text()))
+        except ValueError:
+            self.indexer.increment()
         msg_box = QMessageBox.about(self, "Status", "File Added !")
 
         self.clear()
